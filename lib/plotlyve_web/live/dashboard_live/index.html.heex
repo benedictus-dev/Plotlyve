@@ -3,7 +3,16 @@
     <header class="bg-stone-100 flex justify-between py-5 px-5">
       <h2 class="text-xl subpixel-antialiased">My Plots</h2>
       <aside class="flex gap-x-2 items-center">
-        <Heroicons.Outline.user class="h-5 w-5" /> BY
+        <Heroicons.Outline.user class="h-5 w-5" /> 
+        <%= if @user do %>
+          <.link
+            href={~p"/users/log_out"}
+            method="delete"
+            class=" bg-blue-300 px-3 rounded text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Log out
+          </.link>
+        <% end %>
       </aside>
     </header>
 
