@@ -4,11 +4,15 @@ defmodule PlotlyveWeb.DashboardLive.Index do
   alias PlotlyveWeb.DashboardLive.NewPlotForm
   import PlotlyveWeb.Layout
   import DashboardLive.Components
+  alias Plotlyve.Accounts
 
-  def mount(_, _session, socket) do
+  def mount(_, session, socket) do
+    user = Accounts.get_user_by_session_token(session["user_token"])
+    IO.inspect(user,label: "user")
     {:ok,
      socket
      |> assign(plots: 1)
+      |>assign(user: user)
      |> assign_plot_name()
      |> clear_form()}
   end
