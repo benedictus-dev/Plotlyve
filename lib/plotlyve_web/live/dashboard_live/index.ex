@@ -2,6 +2,7 @@ defmodule PlotlyveWeb.DashboardLive.Index do
   alias Ecto.Changeset
   use PlotlyveWeb, :live_view
   alias PlotlyveWeb.DashboardLive.NewPlotForm
+  import PlotlyveWeb.Layout
   import DashboardLive.Components
 
   def mount(_, _session, socket) do

@@ -21,10 +21,10 @@ defmodule PlotlyveWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/plot", DashboardLive.Index, :index
+    # live "/plot", DashboardLive.Index, :index
 
-    live "/plot/new", DashboardLive.Edit, :new
-    live "/plot/:id", DashboardLive.Edit, :edit
+    # live "/plot/new", DashboardLive.Edit, :new
+    # live "/plot/:id", DashboardLive.Edit, :edit
   end
 
   # Other scopes may use custom stacks.
@@ -72,6 +72,11 @@ defmodule PlotlyveWeb.Router do
       on_mount: [{PlotlyveWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/plot", DashboardLive.Index, :index
+
+      live "/plot/new", DashboardLive.Edit, :new
+      live "/plot/:id", DashboardLive.Edit, :edit
     end
   end
 

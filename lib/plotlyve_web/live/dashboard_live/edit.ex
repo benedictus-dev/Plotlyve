@@ -3,6 +3,7 @@ defmodule PlotlyveWeb.DashboardLive.Edit do
   alias Plotlyve.CsvManagement
   alias Plotlyve.Plots.Plot
   import DashboardLive.Components
+  import PlotlyveWeb.Layout
   use PlotlyveWeb, :live_view
 
   def render(assigns) do
@@ -20,34 +21,36 @@ defmodule PlotlyveWeb.DashboardLive.Edit do
       )
 
     ~H"""
-    <section class="h-full">
-      <header class="bg-stone-100 flex justify-between py-5 px-5">
-        <%!-- Little to no time to implement updating the plot name when a validation occurs --%>
-        <h2 class="text-xl subpixel-antialiased relative">
-          <%!-- <span><.input name={@plot.name} value={@plot.name} /></span> --%>
-          <span class="absolute translate-x-44 translate-y-2">
-            <Heroicons.Outline.pencil class="h-5 w-5" />
-          </span>
-          <input type="text" value={@plot.name} class="rounded -py-1" />
-        </h2>
-        <aside class="flex gap-x-2 items-center">
-          <Heroicons.Outline.user class="h-5 w-5" /> BY
-        </aside>
-      </header>
-      <main class="flex  justify-between h-full ">
-        <div class="flex-1">
-          <div
-            id="histo-gram"
-            phx-hook="HistoGram"
-            data-histogram-data={Jason.encode!(@histogram_data)}
-          >
+    <.main_layout live_action={@live_action}>
+      <section class="h-full">
+        <header class="bg-stone-100 flex justify-between py-5 px-5">
+          <%!-- Little to no time to implement updating the plot name when a validation occurs --%>
+          <h2 class="text-xl subpixel-antialiased relative">
+            <%!-- <span><.input name={@plot.name} value={@plot.name} /></span> --%>
+            <span class="absolute translate-x-44 translate-y-2">
+              <Heroicons.Outline.pencil class="h-5 w-5" />
+            </span>
+            <input type="text" value={@plot.name} class="rounded -py-1" />
+          </h2>
+          <aside class="flex gap-x-2 items-center">
+            <Heroicons.Outline.user class="h-5 w-5" /> BY
+          </aside>
+        </header>
+        <main class="flex  justify-between h-full ">
+          <div class="flex-1">
+            <div
+              id="histo-gram"
+              phx-hook="HistoGram"
+              data-histogram-data={Jason.encode!(@histogram_data)}
+            >
+            </div>
           </div>
-        </div>
-        <div class="w-4/12">
-          <.data_form form={@form} />
-        </div>
-      </main>
-    </section>
+          <div class="w-4/12">
+            <.data_form form={@form} />
+          </div>
+        </main>
+      </section>
+    </.main_layout>
     """
   end
 
@@ -63,7 +66,7 @@ defmodule PlotlyveWeb.DashboardLive.Edit do
     }
   end
 
-  def handle_params(params, url, socket) do
+  def handle_params(params, _url, socket) do
     {
       :noreply,
       apply_action(socket, socket.assigns.live_action, params)
@@ -82,7 +85,7 @@ defmodule PlotlyveWeb.DashboardLive.Edit do
   end
 
   def handle_event("save-plot", params, socket) do
-    IO.inspect(params,label: "TEsssss")
+    IO.inspect(params, label: "TEsssss")
     {:noreply, socket}
   end
 end
