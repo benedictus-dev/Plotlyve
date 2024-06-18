@@ -4,11 +4,7 @@
 <main class={"px-4 py-20 sm:px-6 lg:px-8 " <> if @live_action == :new, do: "h-full",else: "h-[750px]"}>
   <div class="mx-auto  h-full">
     <.flash_group flash={@flash} />
-  <%=inspect(@live_action) %>
-    <section
-      :if={@live_action in [:new, :edit, :index]}
-      class=" grid grid-cols-9 h-full rouned"
-    >
+    <section class=" grid grid-cols-9 h-full rouned">
       <nav class="flex flex-col bg-blue-600 col-span-1 rounded-l-lg flex flex-col justify-start gap-y-3 items-center overflow-hidden ">
         <div class="bg-blue-700 px-14 py-6 ">
           <.link class=" text-blue-100 font-bold border-2 border-sky-100 p-2" navigate={~p"/plot"}>
