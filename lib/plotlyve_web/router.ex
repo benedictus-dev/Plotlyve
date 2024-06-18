@@ -21,10 +21,6 @@ defmodule PlotlyveWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    # live "/plot", DashboardLive.Index, :index
-
-    # live "/plot/new", DashboardLive.Edit, :new
-    # live "/plot/:id", DashboardLive.Edit, :edit
   end
 
   # Other scopes may use custom stacks.
