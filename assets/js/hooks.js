@@ -1,12 +1,18 @@
-import HistoChart from "./histo-chart";
+import Plotly from "plotly.js-dist";
+let Hooks = {};
 
-let Hooks = {
-  HistoChart: HistoChart = {
-    mounted() {},
-    updated() {},
-    destroyed() {},
+Hooks.HistoGram = {
+  mounted() {
+    console.log("I have been mounted");
+    const dataSet = JSON.parse(this.el.dataset.histogramData)
+
+    var trace = {
+      x: dataSet,
+      type: "histogram",
+    };
+    var data = [trace];
+    Plotly.newPlot(this.el,data);
   },
 };
-
 
 export default Hooks;
