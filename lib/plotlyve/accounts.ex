@@ -4,11 +4,16 @@ defmodule Plotlyve.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias Plotlyve.Accounts
   alias Plotlyve.Repo
 
   alias Plotlyve.Accounts.{User, UserToken, UserNotifier}
 
   ## Database getters
+
+  def list_all do
+    Repo.all(Accounts.User)
+  end
 
   @doc """
   Gets a user by email.
@@ -349,5 +354,14 @@ defmodule Plotlyve.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  def get_registered_users(email) do
+    query =
+      from u in User,
+        where: u.email != ^email,
+        select: {u.email,u.id}
+
+    Repo.all(query)
   end
 end

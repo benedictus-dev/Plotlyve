@@ -168,4 +168,60 @@ defmodule Plotlyve.CsvManagementTest do
       assert %Ecto.Changeset{} = CsvManagement.change_csv_column_data(csv_column_data)
     end
   end
+
+  describe "dataclips" do
+    alias Plotlyve.CsvManagement.Dataclip
+
+    import Plotlyve.CsvManagementFixtures
+
+    @invalid_attrs %{shared_with: nil, dataclip: nil}
+
+    test "list_dataclips/0 returns all dataclips" do
+      dataclip = dataclip_fixture()
+      assert CsvManagement.list_dataclips() == [dataclip]
+    end
+
+    test "get_dataclip!/1 returns the dataclip with given id" do
+      dataclip = dataclip_fixture()
+      assert CsvManagement.get_dataclip!(dataclip.id) == dataclip
+    end
+
+    test "create_dataclip/1 with valid data creates a dataclip" do
+      valid_attrs = %{shared_with: "some shared_with", dataclip: %{}}
+
+      assert {:ok, %Dataclip{} = dataclip} = CsvManagement.create_dataclip(valid_attrs)
+      assert dataclip.shared_with == "some shared_with"
+      assert dataclip.dataclip == %{}
+    end
+
+    test "create_dataclip/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = CsvManagement.create_dataclip(@invalid_attrs)
+    end
+
+    test "update_dataclip/2 with valid data updates the dataclip" do
+      dataclip = dataclip_fixture()
+      update_attrs = %{shared_with: "some updated shared_with", dataclip: %{}}
+
+      assert {:ok, %Dataclip{} = dataclip} = CsvManagement.update_dataclip(dataclip, update_attrs)
+      assert dataclip.shared_with == "some updated shared_with"
+      assert dataclip.dataclip == %{}
+    end
+
+    test "update_dataclip/2 with invalid data returns error changeset" do
+      dataclip = dataclip_fixture()
+      assert {:error, %Ecto.Changeset{}} = CsvManagement.update_dataclip(dataclip, @invalid_attrs)
+      assert dataclip == CsvManagement.get_dataclip!(dataclip.id)
+    end
+
+    test "delete_dataclip/1 deletes the dataclip" do
+      dataclip = dataclip_fixture()
+      assert {:ok, %Dataclip{}} = CsvManagement.delete_dataclip(dataclip)
+      assert_raise Ecto.NoResultsError, fn -> CsvManagement.get_dataclip!(dataclip.id) end
+    end
+
+    test "change_dataclip/1 returns a dataclip changeset" do
+      dataclip = dataclip_fixture()
+      assert %Ecto.Changeset{} = CsvManagement.change_dataclip(dataclip)
+    end
+  end
 end

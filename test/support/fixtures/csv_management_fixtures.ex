@@ -47,4 +47,19 @@ defmodule Plotlyve.CsvManagementFixtures do
 
     csv_column_data
   end
+
+  @doc """
+  Generate a dataclip.
+  """
+  def dataclip_fixture(attrs \\ %{}) do
+    {:ok, dataclip} =
+      attrs
+      |> Enum.into(%{
+        dataclip: %{},
+        shared_with: "some shared_with"
+      })
+      |> Plotlyve.CsvManagement.create_dataclip()
+
+    dataclip
+  end
 end

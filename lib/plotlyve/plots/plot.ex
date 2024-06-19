@@ -7,8 +7,8 @@ defmodule Plotlyve.Plots.Plot do
   schema "plots" do
     field :name, :string
     field :expression, :string
-    field :user_id, Ecto.UUID
-    field :csv_metadata_id, Ecto.UUID
+    belongs_to :csv_metadata, Plotlyve.CsvManagement.CsvMetadata, type: :binary_id
+    belongs_to :user, Plotlyve.Accounts.User, type: :binary_id
 
     timestamps(type: :utc_datetime)
   end

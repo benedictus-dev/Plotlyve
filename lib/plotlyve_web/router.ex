@@ -72,7 +72,7 @@ defmodule PlotlyveWeb.Router do
       live "/plot", DashboardLive.Index, :index
 
       live "/plot/new", DashboardLive.Edit, :new
-      live "/plot/:id", DashboardLive.Edit, :edit
+      live "/plot/:id/edit", DashboardLive.Edit, :edit
     end
   end
 
