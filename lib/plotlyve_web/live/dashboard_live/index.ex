@@ -14,6 +14,7 @@ defmodule PlotlyveWeb.DashboardLive.Index do
      socket
      |> assign(plots: Plots.list_plots())
      |> assign(user: user)
+     |> assign(plot_id: "")
      |> assign_collaborators()
      |> assign_plot_name()
      |> clear_share()
@@ -58,24 +59,32 @@ defmodule PlotlyveWeb.DashboardLive.Index do
     changeset =
       PlotlyveWeb.DashboardLive.SelectUser.change_user(%{email: params["share-plot"]})
       |> Map.put(:action, :validate)
+      |> IO.inspect(label: "Outcome")
 
     if changeset.valid? do
       # Oban should be used to schedule this JOB
       dataclip_id =
-        Plots.get_plot_by_user(socket.assigns.user.id)
-        |> CsvManagement.get_dataclip_id_for_plot()
+        CsvManagement.get_dataclip_id_for_plot(socket.assigns.plot_id)
 
       Collaboration.create_share(%{user_id: params["share-plot"], dataclip_id: dataclip_id})
 
       {
         :noreply,
         socket
-        |>put_flash(:info, "plot shared")
-        |>redirect(to: ~p"/plot")
+        |> put_flash(:info, "plot shared")
+        |> redirect(to: ~p"/plot")
       }
     else
       {:noreply, socket |> assign_select(changeset)}
     end
+  end
+
+  def handle_event("plot_id", params, socket) do
+    IO.inspect(params["plot"], label: "Params")
+
+    {:noreply,
+     socket
+     |> assign(plot_id: params["plot"])}
   end
 
   def assign_plot_name(socket) do

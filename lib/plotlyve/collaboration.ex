@@ -4,7 +4,7 @@ defmodule Plotlyve.Collaboration do
   """
 
   import Ecto.Query, warn: false
-  alias Plotlyve.{Repo,Plots}
+  alias Plotlyve.{Repo, Plots}
 
   alias Plotlyve.Collaboration.Share
 
@@ -102,5 +102,12 @@ defmodule Plotlyve.Collaboration do
     Share.changeset(share, attrs)
   end
 
- 
+  def get_plot_viewers(dataclip_id) do
+    query =
+      from sh in Share,
+        where: sh.dataclip_id == ^dataclip_id,
+        select: sh.user_id
+
+    query |> Repo.all()
+  end
 end

@@ -5,7 +5,7 @@ defmodule Plotlyve.CsvManagement do
 
   import Ecto.Query, warn: false
   alias Plotlyve.{Repo}
-
+  alias Plotlyve.Collaboration.Share
   alias Plotlyve.CsvManagement.CsvMetadata
 
   @doc """
@@ -363,4 +363,13 @@ defmodule Plotlyve.CsvManagement do
 
     Repo.one(query)
   end
+
+  # def get_dataclip_viewers(plot_id) do
+  #   query =
+  #     from dc in Dataclip,
+  #       where: dc.plot_id == ^plot_id,
+  #       select: dc.user_id
+
+  #   query |> Repo.all()
+  # end
 end

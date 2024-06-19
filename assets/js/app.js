@@ -35,7 +35,23 @@ let liveSocket = new LiveSocket("/live", Socket, {
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
 window.addEventListener("phx:page-loading-start", (_info) => topbar.show(300));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
+window.addEventListener("phx:display-modal", (e) => {
+  let el = document.getElementById("share-modal");
+  console.log("Here we are", el);
+  if (el) {
+    el.classList.remove("hidden");
+    el.style.display = "block";
 
+    let modalBg = document.getElementById("share-modal-bg");
+    let modalContainer = document.getElementById("share-modal-container");
+    if (modalBg) {
+      modalBg.classList.remove("hidden");
+    }
+    if (modalContainer) {
+      modalContainer.classList.remove("hidden");
+    }
+  }
+});
 // connect if there are any LiveViews on the page
 liveSocket.connect();
 
