@@ -1,19 +1,22 @@
 defmodule PlotlyveWeb.DashboardLive.Index do
-  alias Ecto.Changeset
+  alias Plotlyve.CsvManagement
   use PlotlyveWeb, :live_view
-  alias PlotlyveWeb.DashboardLive.NewPlotForm
+  alias PlotlyveWeb.DashboardLive.{NewPlotForm, SelectUser}
   import PlotlyveWeb.Layout
   import DashboardLive.Components
-  alias Plotlyve.Accounts
+  alias Plotlyve.{Accounts, Plots, Collaboration}
 
   def mount(_, session, socket) do
     user = Accounts.get_user_by_session_token(session["user_token"])
-    IO.inspect(user,label: "user")
+    IO.inspect(user, label: "user")
+
     {:ok,
      socket
-     |> assign(plots: 1)
-      |>assign(user: user)
+     |> assign(plots: Plots.list_plots())
+     |> assign(user: user)
+     |> assign_collaborators()
      |> assign_plot_name()
+     |> clear_share()
      |> clear_form()}
   end
 
@@ -51,6 +54,30 @@ defmodule PlotlyveWeb.DashboardLive.Index do
     {:noreply, assign_form(socket, changeset)}
   end
 
+  def handle_event("share-plot", params, socket) do
+    changeset =
+      PlotlyveWeb.DashboardLive.SelectUser.change_user(%{email: params["share-plot"]})
+      |> Map.put(:action, :validate)
+
+    if changeset.valid? do
+      # Oban should be used to schedule this JOB
+      dataclip_id =
+        Plots.get_plot_by_user(socket.assigns.user.id)
+        |> CsvManagement.get_dataclip_id_for_plot()
+
+      Collaboration.create_share(%{user_id: params["share-plot"], dataclip_id: dataclip_id})
+
+      {
+        :noreply,
+        socket
+        |>put_flash(:info, "plot shared")
+        |>redirect(to: ~p"/plot")
+      }
+    else
+      {:noreply, socket |> assign_select(changeset)}
+    end
+  end
+
   def assign_plot_name(socket) do
     socket
     |> assign(:new_plot_name, %NewPlotForm{})
@@ -65,7 +92,28 @@ defmodule PlotlyveWeb.DashboardLive.Index do
     assign(socket, :form, form)
   end
 
+  def clear_share(socket) do
+    share =
+      SelectUser.change_user()
+      |> to_form()
+
+    assign(socket, :share, share)
+  end
+
   def assign_form(socket, changeset) do
     assign(socket, :form, to_form(changeset))
+  end
+
+  def assign_select(socket, changeset) do
+    assign(socket, :share, to_form(changeset))
+  end
+
+  def assign_collaborators(socket) do
+    collaborators =
+      Accounts.get_registered_users(socket.assigns.user.email)
+      |> Enum.map(fn {key, value} -> {String.to_atom(key), value} end)
+      |> IO.inspect(label: "Collaboar")
+
+    assign(socket, :share_with, collaborators)
   end
 end

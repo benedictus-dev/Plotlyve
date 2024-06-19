@@ -2,8 +2,11 @@ defmodule PlotlyveWeb.DashboardLive.Edit do
   alias PlotlyveWeb.DashboardLive.NewPlotForm
   alias Plotlyve.CsvManagement
   alias Plotlyve.Plots.Plot
+  alias Plotlyve.Plots
   import DashboardLive.Components
   import PlotlyveWeb.Layout
+  alias Plotlyve.Accounts
+
   use PlotlyveWeb, :live_view
 
   def render(assigns) do
@@ -33,7 +36,15 @@ defmodule PlotlyveWeb.DashboardLive.Edit do
             <input type="text" value={@plot.name} class="rounded -py-1" />
           </h2>
           <aside class="flex gap-x-2 items-center">
-            <Heroicons.Outline.user class="h-5 w-5" /> BY
+            <%= if @user do %>
+              <.link
+                href={~p"/users/log_out"}
+                method="delete"
+                class=" flex items-center bg-blue-300 px-3 py-2 rounded text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              >
+                <Heroicons.Outline.user class="h-5 w-5 mr-2" /> Log out
+              </.link>
+            <% end %>
           </aside>
         </header>
         <main class="flex  justify-between h-full ">
@@ -54,11 +65,14 @@ defmodule PlotlyveWeb.DashboardLive.Edit do
     """
   end
 
-  def mount(_, _, socket) do
+  def mount(_, session, socket) do
+    user = Accounts.get_user_by_session_token(session["user_token"])
+
     {
       :ok,
       socket
       |> assign(plot_name: nil)
+      |> assign(user: user)
       |> assign(page_title: "")
       |> assign(plot: %{})
       |> assign(histogram_data: nil)
@@ -80,12 +94,50 @@ defmodule PlotlyveWeb.DashboardLive.Edit do
       :histogram_data,
       hd(CsvManagement.get_column_data_by_column_name_and_filename("iris.csv", "SepalWidth"))
       |> Map.get(:values)
+      |> IO.inspect(label: "Dataclip")
     )
-    |> assign(:plot, %NewPlotForm{name: params["name"]})
+    |> assign(:plot, %Plot{name: params["name"]})
   end
 
   def handle_event("save-plot", params, socket) do
     IO.inspect(params, label: "TEsssss")
-    {:noreply, socket}
+    # Irky  but quick fix
+    changeset =
+      socket.assigns.plot
+      |> Plots.change_plot(%{
+        expression: params["expression"],
+        user_id: socket.assigns.user.id,
+        csv_metadata_id:
+          CsvManagement.get_csv_metadata_by_filename(params["datasetname"] <> ".csv")
+          |> Map.get(:id)
+      })
+      |> Map.put(:action, :validate)
+
+    if changeset.valid? do
+      changes = Ecto.Changeset.apply_changes(changeset) |> Map.from_struct()
+
+      case Plots.create_plot(changes) do
+        {:ok, plot} ->
+          #This is an antipattern
+          CsvManagement.create_dataclip(%{
+            plot_id: plot.id,
+            dataclip: socket.assigns.histogram_data
+          })
+
+          {:noreply,
+           socket
+           |> put_flash(:info, "Plot created successfully")
+           |> push_navigate(to: ~p"/plot/")}
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          IO.puts("Not created")
+          {:noreply, socket}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
+  defp validate_params(socket) do
   end
 end

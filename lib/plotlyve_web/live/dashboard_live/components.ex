@@ -2,6 +2,7 @@ defmodule DashboardLive.Components do
   use Phoenix.Component
   import PlotlyveWeb.CoreComponents
   alias Phoenix.LiveView.JS
+  use PlotlyveWeb, :html
 
   def simple_table(assigns) do
     ~H"""
@@ -62,21 +63,49 @@ defmodule DashboardLive.Components do
   end
 
   def my_plots(assigns) do
+    assigns =
+      assigns
+      |> assign(email: "user@gmail.com")
+
     ~H"""
     <section class=" px-5 mt-7">
       <header class=" flex justify-between ">
-        <h2>Plots</h2>
+        <h2>Total Plots <%= length(@plots) %></h2>
         <.create_plot />
       </header>
       <%!--
-      <.simple_table rows={[%{name: "Jane", age: "34"}, %{name: "Bob", age: "51"}]}>
-        <:column :let={user} label="Name">
-          <%= user.name %>
+      <.simple_table rows={@plots}>
+        <:column :let={plot} label="Name">
+          <%= plot.name %>
         </:column>
-        <:column :let={user} label="Age">
-          <%= user.age %>
+        <:column :let={plot} label="Age">
+          <%= plot.expression %>
         </:column>
       </.simple_table> --%>
+
+      <div class="w-5/6 mx-auto">
+        <.table id="plots" rows={@plots} row_click={}>
+          <:col :let={plot} label="Name"><%= plot.name %></:col>
+          <:col :let={plot} label="Expression"><%= plot.expression %></:col>
+          <:col :let={_plot} label="Shared with"><%= @email %></:col>
+          <:action>
+            <.link
+              class="bg-blue-300 rounded px-2 inline-block text-blue-900"
+              navigate={~p"/plot/:id/edit"}
+            >
+              Edit
+            </.link>
+          </:action>
+          <:action>
+            <button
+              class="bg-blue-300 rounded px-2 text-blue-900"
+              phx-click={show_modal("share-modal")}
+            >
+              Share
+            </button>
+          </:action>
+        </.table>
+      </div>
     </section>
     """
   end
@@ -130,6 +159,41 @@ defmodule DashboardLive.Components do
     <.simple_form for={@form} phx-change="validate">
       <.input field={@form[:email]} />
     </.simple_form>
+    """
+  end
+
+  def share_modal(assigns) do
+    ~H"""
+    <.modal id="share-modal" heading_text="Share your plot ">
+      <main>
+        <.simple_form for={@share} class="mt-10 space-y-8 bg-white" id="share-plot" phx-submit="share-plot">
+          <.input
+            options={@share_with}
+            type="select"
+            name="share-plot"
+            field={@share[:email]}
+            label="Select user"
+            prompt=""
+          />
+          <div class="flex justify-between">
+            <button
+              class="bg-blue-500 font-bold px-6 py-2 rounded text-white mr-3"
+              phx-disable-with="Sharing plot"
+            >
+              Share
+            </button>
+            <button
+              type="button"
+              class="text-black-500 font-bold border-2 border-black px-4 py-1 text-gray-600 rounded"
+              phx-click={hide_modal("share-modal")}
+            >
+              Cancel
+            </button>
+          </div>
+        </.simple_form>
+      </main>
+      <footer class=" mt-4 flex justify-end"></footer>
+    </.modal>
     """
   end
 end

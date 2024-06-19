@@ -101,4 +101,13 @@ defmodule Plotlyve.Plots do
   def change_plot(%Plot{} = plot, attrs \\ %{}) do
     Plot.changeset(plot, attrs)
   end
+
+  def get_plot_by_user(user_id) do
+    query =
+      from p in Plot,
+        where: p.user_id == ^user_id,
+        select: p.id
+
+    Repo.one(query)
+  end
 end

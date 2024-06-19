@@ -4,7 +4,7 @@ defmodule Plotlyve.CsvManagement do
   """
 
   import Ecto.Query, warn: false
-  alias Plotlyve.Repo
+  alias Plotlyve.{Repo}
 
   alias Plotlyve.CsvManagement.CsvMetadata
 
@@ -236,5 +236,131 @@ defmodule Plotlyve.CsvManagement do
         select: cc
 
     Repo.all(query)
+  end
+
+  @doc """
+  Gets a single csv_metadata by filename.
+
+  ## Examples
+
+      iex> get_csv_metadata_by_filename("iris.csv")
+      %CsvMetadata{}
+
+      iex> get_csv_metadata_by_filename("nonexistent.csv")
+      nil
+
+  """
+  def get_csv_metadata_by_filename(filename) do
+    query =
+      from cm in CsvMetadata,
+        where: cm.filename == ^filename,
+        limit: 1
+
+    Repo.one(query)
+  end
+
+  alias Plotlyve.CsvManagement.Dataclip
+
+  @doc """
+  Returns the list of dataclips.
+
+  ## Examples
+
+      iex> list_dataclips()
+      [%Dataclip{}, ...]
+
+  """
+  def list_dataclips do
+    Repo.all(Dataclip)
+  end
+
+  @doc """
+  Gets a single dataclip.
+
+  Raises `Ecto.NoResultsError` if the Dataclip does not exist.
+
+  ## Examples
+
+      iex> get_dataclip!(123)
+      %Dataclip{}
+
+      iex> get_dataclip!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_dataclip!(id), do: Repo.get!(Dataclip, id)
+
+  @doc """
+  Creates a dataclip.
+
+  ## Examples
+
+      iex> create_dataclip(%{field: value})
+      {:ok, %Dataclip{}}
+
+      iex> create_dataclip(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_dataclip(attrs \\ %{}) do
+    %Dataclip{}
+    |> Dataclip.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a dataclip.
+
+  ## Examples
+
+      iex> update_dataclip(dataclip, %{field: new_value})
+      {:ok, %Dataclip{}}
+
+      iex> update_dataclip(dataclip, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_dataclip(%Dataclip{} = dataclip, attrs) do
+    dataclip
+    |> Dataclip.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a dataclip.
+
+  ## Examples
+
+      iex> delete_dataclip(dataclip)
+      {:ok, %Dataclip{}}
+
+      iex> delete_dataclip(dataclip)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_dataclip(%Dataclip{} = dataclip) do
+    Repo.delete(dataclip)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking dataclip changes.
+
+  ## Examples
+
+      iex> change_dataclip(dataclip)
+      %Ecto.Changeset{data: %Dataclip{}}
+
+  """
+  def change_dataclip(%Dataclip{} = dataclip, attrs \\ %{}) do
+    Dataclip.changeset(dataclip, attrs)
+  end
+
+  def get_dataclip_id_for_plot(plot_id) do
+    query =
+      from dc in Dataclip,
+        where: dc.plot_id == ^plot_id,
+        select: dc.id
+
+    Repo.one(query)
   end
 end
