@@ -73,37 +73,38 @@ defmodule DashboardLive.Components do
         <h2>Total Plots <%= length(@plots) %></h2>
         <.create_plot />
       </header>
-      <%!--
-      <.simple_table rows={@plots}>
-        <:column :let={plot} label="Name">
-          <%= plot.name %>
-        </:column>
-        <:column :let={plot} label="Age">
-          <%= plot.expression %>
-        </:column>
-      </.simple_table> --%>
-
       <div class="w-5/6 mx-auto">
         <.table id="plots" rows={@plots} row_click={}>
           <:col :let={plot} label="Name"><%= plot.name %></:col>
           <:col :let={plot} label="Expression"><%= plot.expression %></:col>
-          <:col :let={_plot} label="Shared with"><%= @email %></:col>
-          <:action>
-            <.link
-              class="bg-blue-300 rounded px-2 inline-block text-blue-900"
-              navigate={~p"/plot/:id/edit"}
-            >
-              Edit
-            </.link>
-          </:action>
-          <:action>
-            <button
-              class="bg-blue-300 rounded px-2 text-blue-900"
-              phx-click={show_modal("share-modal")}
-            >
-              Share
-            </button>
-          </:action>
+          <:col :let={plot} label="Actions">
+            <div>
+              <.link
+                class="bg-blue-300 rounded px-2 mr-4 inline-block text-blue-900"
+                navigate={~p"/plot/:id/edit"}
+              >
+                Edit
+              </.link>
+              <button
+                class="bg-blue-300 rounded px-2 text-blue-900"
+                phx-click={
+                  %JS{}
+                  |> JS.push("plot_id", value: %{plot: plot.id})
+                  |> JS.show(to: "#share-modal")
+                  |> JS.show(
+                    to: "#share-modal-bg",
+                    transition:
+                      {"transition-all transform ease-out duration-300", "opacity-0", "opacity-100"}
+                  )
+                  |> show("#share-modal-container")
+                  |> JS.add_class("overflow-hidden", to: "body")
+                  |> JS.focus_first(to: "#share-modal-content")
+                }
+              >
+                Share
+              </button>
+            </div>
+          </:col>
         </.table>
       </div>
     </section>
@@ -166,7 +167,12 @@ defmodule DashboardLive.Components do
     ~H"""
     <.modal id="share-modal" heading_text="Share your plot ">
       <main>
-        <.simple_form for={@share} class="mt-10 space-y-8 bg-white" id="share-plot" phx-submit="share-plot">
+        <.simple_form
+          for={@share}
+          class="mt-10 space-y-8 bg-white"
+          id="share-plot"
+          phx-submit="share-plot"
+        >
           <.input
             options={@share_with}
             type="select"
@@ -192,7 +198,6 @@ defmodule DashboardLive.Components do
           </div>
         </.simple_form>
       </main>
-      <footer class=" mt-4 flex justify-end"></footer>
     </.modal>
     """
   end

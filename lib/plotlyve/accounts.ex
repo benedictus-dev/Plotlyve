@@ -364,4 +364,9 @@ defmodule Plotlyve.Accounts do
 
     Repo.all(query)
   end
+
+  # def get_emails_by_user_id(users) do
+  #   users
+  #   |>
+  # end
 end

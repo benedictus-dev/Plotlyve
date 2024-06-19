@@ -17,4 +17,5 @@ defmodule Plotlyve.CsvManagement.Dataclip do
     |> cast(attrs, [:plot_id, :dataclip])
     |> validate_required([:plot_id,:dataclip])
   end
+  
 end
